@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const express = require('express');
 const app = express();
@@ -22,12 +22,41 @@ async function run() {
             const result = await coffeesCollection.find().toArray()
             res.send(result)
         })
-        // Post coffee data from clint side
+        // get coffee single data data 
+        app.get('/coffees/:id',async(req,res)=>{
+            const id = req.params.id 
+            const query = {_id: new ObjectId(id)}
+            const result = await coffeesCollection.findOne(query)
+            res.send(result)
+        })
+        // Post coffee data 
         app.post('/coffees',async(req,res)=>{
             const coffee = req.body;
             const result = await coffeesCollection.insertOne(coffee)
             res.send(result)
         })
+        // Update coffee data
+        app.put('/coffees/:id',async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id:new ObjectId(id)}
+            const options = { upsert: true };
+            const updatedDoc = req.body;
+            console.log(updatedDoc);
+            const updatedDocument = {
+                $set:{...updatedDoc}
+            }
+            const result = await coffeesCollection.updateOne(query,updatedDocument,options)
+            res.send(result)
+        })
+        // delete coffee data
+        app.delete('/coffees/:id',async(req,res)=>{
+            const id = req.params.id 
+            const query = {_id: new ObjectId(id)}
+            const result = await coffeesCollection.deleteOne(query)
+            res.send(result)
+        })
+
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
