@@ -17,6 +17,11 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const coffeesCollection = client.db('coffeeDb').collection('coffees')
+        // Get coffee data from database 
+        app.get('/coffees',async(req,res)=>{
+            const result = await coffeesCollection.find().toArray()
+            res.send(result)
+        })
         // Post coffee data from clint side
         app.post('/coffees',async(req,res)=>{
             const coffee = req.body;
